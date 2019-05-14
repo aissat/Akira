@@ -28,7 +28,6 @@ public class Akira.Window : Gtk.ApplicationWindow {
     public Akira.Services.EventBus event_bus;
     public Akira.Layouts.HeaderBar headerbar;
     public Akira.Layouts.MainWindow main_window;
-    public Akira.Widgets.SettingsDialog? settings_dialog = null;
     public Akira.Utils.Dialogs dialogs;
 
     public SimpleActionGroup actions { get; construct; }
@@ -59,7 +58,6 @@ public class Akira.Window : Gtk.ApplicationWindow {
         build_ui ();
 
         move (settings.pos_x, settings.pos_y);
-        resize (settings.window_width, settings.window_height);
 
         show_app ();
     }
@@ -88,9 +86,9 @@ public class Akira.Window : Gtk.ApplicationWindow {
             Gdk.Screen.get_default (), css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
         );
 
-        if (!settings.show_label) {
-            Akira.Services.ActionManager.action_from_group (Akira.Services.ActionManager.ACTION_LABELS, get_action_group ("win"));
-        }
+        resize (settings.window_width, settings.window_height);
+        main_window.pane.position = settings.left_paned;
+        main_window.pane2.position = settings.right_paned;
     }
 
     public bool before_destroy () {
@@ -133,14 +131,13 @@ public class Akira.Window : Gtk.ApplicationWindow {
         settings.pos_y = y;
         settings.window_width = width;
         settings.window_height = height;
-        settings.right_paned = main_window.main_canvas.get_allocated_width ();
-        settings.left_paned = main_window.left_sidebar.get_allocated_width ();
+        settings.left_paned = main_window.pane.get_position ();
+        settings.right_paned = main_window.pane2.get_position ();
     }
 
     public void show_app () {
-        show_all ();
         apply_user_settings ();
-
+        show_all ();
         show ();
         present ();
     }

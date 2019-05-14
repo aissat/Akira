@@ -16,34 +16,29 @@
 * You should have received a copy of the GNU General Public License
 * along with Akira.  If not, see <https://www.gnu.org/licenses/>.
 *
-* Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
+* Authored by: Bilal Elmoussaoui <bilal.elmoussaoui@gnome.org>
 */
 
-public class Akira.Layouts.StatusBar : Gtk.Grid {
-    public bool toggled {
-        get {
-            return visible;
-        } set {
-            visible = value;
-            no_show_all = !value;
-        }
+public class Akira.Partials.ButtonImage: Gtk.Image {
+
+    private string icon;
+    private Gtk.IconSize size;
+
+    public ButtonImage (string icon_name, Gtk.IconSize icon_size = Gtk.IconSize.LARGE_TOOLBAR) {
+        icon = icon_name;
+        size = icon_size;
+        margin = 0;
+
+        settings.changed["use-symbolic"].connect(() => {
+            update_image();
+        });
+
+        update_image ();
     }
 
-    public StatusBar () {
-        Object (toggled: true);
-    }
-
-    construct {
-        get_style_context ().add_class ("statusbar");
-
-        var label = new Gtk.Label ("Status Bar");
-        label.halign = Gtk.Align.CENTER;
-        label.margin = 6;
-
-        attach (label, 0, 0, 1, 1);
-    }
-
-    public void toggle () {
-        toggled = !toggled;
+    private void update_image () {
+        var size = settings.use_symbolic ? Gtk.IconSize.SMALL_TOOLBAR : size;
+        var icon = settings.use_symbolic ? ("%s-symbolic".printf (icon)) : icon.replace ("-symbolic", "");
+        set_from_icon_name (icon, size);
     }
 }
